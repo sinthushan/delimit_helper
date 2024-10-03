@@ -1,5 +1,3 @@
-//TODO: Fix the below code to work with new delimiter array of Delimiter instances
-
 import React, { useEffect, useState } from "react";
 import { ResultPane } from "./components/ResultPane";
 import { TextArea } from "./components/TextArea";
@@ -30,17 +28,28 @@ function App() {
   }, []);
 
   const result = find_delimiters(text);
-
-  function cleanArray(arr: string[]): string[] {
+  console.log(result);
+  function cleanArray(arr: string[][]): string[] {
     return arr
       .join("##@#")
       .split("##@#")
       .filter((n) => n);
   }
 
-  function find_delimiters(words: string): string[] {
+  function list_to_listoflist(list: string[], delimiter: string) {
+    if (!delimiter) {
+      return list.map((row) => {
+        return [row];
+      });
+    }
+    return list.map((row) => {
+      row.split(delimiter);
+    });
+  }
+
+  function find_delimiters(words: string): string[][] {
     if (!words) {
-      return ["Waiting for input..."];
+      return [["Waiting for input..."]];
     }
 
     const possible_delimiters: (number | string | string[])[][] = [];
@@ -50,15 +59,15 @@ function App() {
       const count = arr.length - 1;
       if (count > 0) {
         delimiter.found = true;
-        console.log(delimiter.type);
-        if (delimiter.type !== "ignore") {
+
+        if (delimiter.type === "row") {
           possible_delimiters.push([count, delimiter.delimiter, arr]);
         }
       }
     });
 
     if (possible_delimiters.length === 0) {
-      return ["No clear delimiter found"];
+      return [["No clear delimiter found"]];
     }
 
     const sorted_list = possible_delimiters.sort(function (a, b) {
@@ -66,16 +75,25 @@ function App() {
       const countB = b[0] as number;
       return countB - countA;
     });
-    let delimited_list = sorted_list[0][2] as string[];
+    let delimited_list = [sorted_list[0][2]] as string[][];
 
     if (isRecursive) {
       const temp_list = find_delimiters(delimited_list.join("##@#"));
-      if (temp_list[0] !== "No clear delimiter found") {
+      if (temp_list[0][0] !== "No clear delimiter found") {
         delimited_list = temp_list;
       }
     }
+    const delimited_list_clean = cleanArray(delimited_list);
+    const columnDelimeter = delimiters.filter(
+      (delimiter) => delimiter.type === "col"
+    )[0]?.delimiter;
+    console.log(columnDelimeter);
+    const delimited_map = list_to_listoflist(
+      delimited_list_clean,
+      columnDelimeter
+    );
 
-    return cleanArray(delimited_list);
+    return delimited_map as string[][];
   }
 
   function handleInput(e: React.ChangeEvent<HTMLTextAreaElement>) {
@@ -86,7 +104,7 @@ function App() {
   }
   function handleSelect(e: React.ChangeEvent<HTMLSelectElement>) {
     const include = e.target.value as "row" | "col" | "ignore";
-    console.log(e.target.labels);
+
     const delimiter = delimiters.filter(
       (delimiter) => delimiter.delimiter === e.target.labels[0].innerText
     )[0];

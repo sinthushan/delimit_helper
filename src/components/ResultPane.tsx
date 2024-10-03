@@ -1,7 +1,15 @@
-export const ResultPane = ({ result }: { result: string[] }) => {
+export const ResultPane = ({ result }: { result: string[][] }) => {
   return (
     <section className="resultpane">
-      {result ? result.map((str) => <div>{str}</div>) : ""}
+      {result
+        ? result.map((row) => (
+            <div>
+              {row.map((col) => (
+                <div>{col}</div>
+              ))}
+            </div>
+          ))
+        : ""}
     </section>
   );
 };
