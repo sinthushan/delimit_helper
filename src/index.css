@@ -37,6 +37,8 @@ body {
 
 textarea {
   all: unset;
+  text-wrap: wrap;
+  word-wrap: break-word;
   width: 100%;
   height: 100%;
   padding: 1rem;
@@ -56,4 +58,20 @@ textarea {
 
 label {
   font-size: small;
+}
+
+table {
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.delimiters {
+  display: flex;
+  flex-direction: row;
+}
+
+.delimiter {
+  display: flex;
+  flex-direction: column;
 }

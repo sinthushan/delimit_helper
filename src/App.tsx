@@ -6,135 +6,88 @@ import { Filters } from "./components/Filters";
 import { IDelimiter, delimiters } from "./models/delimiter";
 function App() {
   const [text, setText] = useState("");
-  const [isRecursive, setIsRecursive] = useState(false);
+  const [delimitedText, setDelimitedText] = useState<string[][]>([[""]]);
+  const possible_delimiters = find_delimiters(text);
+  let message = "";
 
-  const [rowDelimiters, setRowDelimiters] = useState<string[]>([]);
-  const [colDelimiters, setColDelimiters] = useState("");
+  if (!text) {
+    message = "Waiting for user input...";
+  } else if (possible_delimiters.length === 0) {
+    message = "No delimiters found";
+  } else {
+    message = "Please see results:";
+  }
 
   useEffect(() => {
-    setRowDelimiters(
-      delimiters.map((delimiter): string => {
-        if (delimiter.type === "row") {
-          return delimiter.delimiter;
-        }
-      })
-    );
-    const columnDelimeter = delimiters.filter(
-      (delimiter) => delimiter.type === "col"
-    )[0]?.delimiter;
-    if (columnDelimeter) {
-      setColDelimiters(columnDelimeter);
-    }
-  }, []);
+    setDelimitedText(delimitText(text));
+  }, [text]);
 
-  const result = find_delimiters(text);
-  console.log(result);
-  function cleanArray(arr: string[][]): string[] {
-    return arr
-      .join("##@#")
-      .split("##@#")
-      .filter((n) => n);
-  }
-
-  function list_to_listoflist(list: string[], delimiter: string) {
-    if (!delimiter) {
-      return list.map((row) => {
-        return [row];
-      });
-    }
-    return list.map((row) => {
-      row.split(delimiter);
-    });
-  }
-
-  function find_delimiters(words: string): string[][] {
-    if (!words) {
-      return [["Waiting for input..."]];
-    }
-
+  function find_delimiters(text: string): (number | string | string[])[][] {
     const possible_delimiters: (number | string | string[])[][] = [];
-
     delimiters.forEach((delimiter: IDelimiter) => {
-      const arr = words.split(delimiter.delimiter);
+      let arr = [];
+      if (delimiter.delimiter == "space") {
+        arr = text.split(" ");
+      } else {
+        arr = text.split(delimiter.delimiter);
+      }
+
       const count = arr.length - 1;
       if (count > 0) {
         delimiter.found = true;
+        possible_delimiters.push([count, delimiter.delimiter, arr]);
+      } else {
+        delimiter.found = false;
+      }
+    });
+    return possible_delimiters;
+  }
 
-        if (delimiter.type === "row") {
-          possible_delimiters.push([count, delimiter.delimiter, arr]);
+  function delimitText(text: string): string[][] {
+    const ROWDELIMITER = "#&^";
+    const COLDELIMITER = "$%&";
+
+    delimiters.forEach((delimiter: IDelimiter) => {
+      if (delimiter.type === "row") {
+        if (delimiter.delimiter == "space") {
+          text = text.replaceAll(" ", ROWDELIMITER);
+        } else {
+          text = text.replaceAll(delimiter.delimiter, ROWDELIMITER);
+        }
+      } else if (delimiter.type === "col") {
+        if (delimiter.delimiter == "space") {
+          text = text.replaceAll(" ", COLDELIMITER);
+        } else {
+          text = text.replaceAll(delimiter.delimiter, COLDELIMITER);
         }
       }
     });
 
-    if (possible_delimiters.length === 0) {
-      return [["No clear delimiter found"]];
-    }
-
-    const sorted_list = possible_delimiters.sort(function (a, b) {
-      const countA = a[0] as number;
-      const countB = b[0] as number;
-      return countB - countA;
-    });
-    let delimited_list = [sorted_list[0][2]] as string[][];
-
-    if (isRecursive) {
-      const temp_list = find_delimiters(delimited_list.join("##@#"));
-      if (temp_list[0][0] !== "No clear delimiter found") {
-        delimited_list = temp_list;
-      }
-    }
-    const delimited_list_clean = cleanArray(delimited_list);
-    const columnDelimeter = delimiters.filter(
-      (delimiter) => delimiter.type === "col"
-    )[0]?.delimiter;
-    console.log(columnDelimeter);
-    const delimited_map = list_to_listoflist(
-      delimited_list_clean,
-      columnDelimeter
-    );
-
-    return delimited_map as string[][];
+    const delimitedText = text
+      .split(ROWDELIMITER)
+      .map((row) => row.split(COLDELIMITER));
+    return delimitedText;
   }
 
   function handleInput(e: React.ChangeEvent<HTMLTextAreaElement>) {
     setText(e.target.value);
   }
-  function handleCheck() {
-    setIsRecursive(!isRecursive);
-  }
+
   function handleSelect(e: React.ChangeEvent<HTMLSelectElement>) {
     const include = e.target.value as "row" | "col" | "ignore";
-
-    const delimiter = delimiters.filter(
-      (delimiter) => delimiter.delimiter === e.target.labels[0].innerText
-    )[0];
-    delimiter.type = include;
-    setRowDelimiters(
-      delimiters.map((delimiter): string => {
-        if (delimiter.type === "row") {
-          return delimiter.delimiter;
-        }
-      })
-    );
-    const columnDelimeter = delimiters.filter(
-      (delimiter) => delimiter.type === "col"
-    )[0]?.delimiter;
-    if (columnDelimeter) {
-      setColDelimiters(columnDelimeter);
-    }
+    const targetDelimiter = e.target.labels[0].innerText;
+    delimiters.filter(
+      (delimiter) => delimiter.delimiter === targetDelimiter
+    )[0].type = include;
+    setDelimitedText(delimitText(text));
   }
   return (
     <>
       <Header />
-      <Filters
-        delimiters={delimiters}
-        handleCheck={handleCheck}
-        isChecked={isRecursive}
-        handleSelect={handleSelect}
-      />
+      <Filters delimiters={delimiters} handleSelect={handleSelect} />
       <main className="container">
         <TextArea handleInput={handleInput} text={text} />
-        <ResultPane result={result} />
+        <ResultPane message={message} delimitedText={delimitedText} />
       </main>
     </>
   );

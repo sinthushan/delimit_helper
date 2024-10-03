@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 export interface IDelimiter {
   delimiter: string;
   type: "row" | "col" | "ignore";
@@ -14,7 +15,7 @@ class Delimiter implements IDelimiter {
   }
 }
 
-const DELIMITERS_LIST = [",", " ", ";", "|", "\t"];
+const DELIMITERS_LIST = [",", "space", ";", "|", "\t"];
 
 export const delimiters: Delimiter[] = DELIMITERS_LIST.map(
   (delimiter) => new Delimiter(delimiter)

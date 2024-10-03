@@ -2,28 +2,14 @@ import { IDelimiter } from "../models/delimiter";
 
 export const Filters = ({
   delimiters,
-  handleCheck,
-  isChecked,
   handleSelect,
 }: {
   delimiters: IDelimiter[];
-  handleCheck: () => void;
-  isChecked: boolean;
   handleSelect: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }) => {
   const foundDelimiters = delimiters.filter((delimiter) => delimiter.found);
   return (
     <section className="filters">
-      <div className="multi">
-        <label htmlFor="recursive">Multiple Delimeters: </label>
-        <input
-          type="checkbox"
-          name="recusive"
-          id="recursive"
-          checked={isChecked}
-          onClick={handleCheck}
-        />
-      </div>
       <div className="found-delimiters">
         <header>Found Delimiters</header>
         <div className="delimiters">

@@ -1,15 +1,28 @@
-export const ResultPane = ({ result }: { result: string[][] }) => {
+export const ResultPane = ({
+  message,
+  delimitedText,
+}: {
+  message: string;
+  delimitedText: string[][];
+}) => {
   return (
     <section className="resultpane">
-      {result
-        ? result.map((row) => (
-            <div>
-              {row.map((col) => (
-                <div>{col}</div>
-              ))}
-            </div>
-          ))
-        : ""}
+      <p>{message}</p>
+      {delimitedText ? (
+        <table>
+          <tbody>
+            {delimitedText.map((row) => (
+              <tr className="row">
+                {row.map((col) => (
+                  <td className="col">{col}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        ""
+      )}
     </section>
   );
 };
