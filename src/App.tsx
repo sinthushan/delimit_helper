@@ -1,6 +1,6 @@
 //TODO: Fix the below code to work with new delimiter array of Delimiter instances
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ResultPane } from "./components/ResultPane";
 import { TextArea } from "./components/TextArea";
 import { Header } from "./components/Header";
@@ -12,8 +12,23 @@ function App() {
 
   const [rowDelimiters, setRowDelimiters] = useState<string[]>([]);
   const [colDelimiters, setColDelimiters] = useState("");
-  let delimiter_list: string[] = [];
-  //const delimiters: string[] = [",", " ", ";", "|", "\t"];
+
+  useEffect(() => {
+    setRowDelimiters(
+      delimiters.map((delimiter): string => {
+        if (delimiter.type === "row") {
+          return delimiter.delimiter;
+        }
+      })
+    );
+    const columnDelimeter = delimiters.filter(
+      (delimiter) => delimiter.type === "col"
+    )[0]?.delimiter;
+    if (columnDelimeter) {
+      setColDelimiters(columnDelimeter);
+    }
+  }, []);
+
   const result = find_delimiters(text);
 
   function cleanArray(arr: string[]): string[] {
@@ -34,14 +49,9 @@ function App() {
       const arr = words.split(delimiter.delimiter);
       const count = arr.length - 1;
       if (count > 0) {
-        if (!delimiter_list.includes(delimiter.delimiter)) {
-          if (isRecursive) {
-            delimiter_list.push(delimiter.delimiter);
-          } else {
-            delimiter_list = [delimiter.delimiter];
-          }
-        }
-        if (delimiter.isRowDelimiter) {
+        delimiter.found = true;
+        console.log(delimiter.type);
+        if (delimiter.type !== "ignore") {
           possible_delimiters.push([count, delimiter.delimiter, arr]);
         }
       }
@@ -75,41 +85,31 @@ function App() {
     setIsRecursive(!isRecursive);
   }
   function handleSelect(e: React.ChangeEvent<HTMLSelectElement>) {
-    const include = e.target.value;
+    const include = e.target.value as "row" | "col" | "ignore";
+    console.log(e.target.labels);
     const delimiter = delimiters.filter(
       (delimiter) => delimiter.delimiter === e.target.labels[0].innerText
     )[0];
-    if (include === "col") {
-      delimiter.isRowDelimiter = false;
-      delimiter.isColumnDelimiter = true;
-      delimiter.ignore = false;
-    } else if (include === "row") {
-      delimiter.isRowDelimiter = true;
-      delimiter.isColumnDelimiter = false;
-      delimiter.ignore = false;
-    } else if (include === "ignore") {
-      delimiter.isRowDelimiter = false;
-      delimiter.isColumnDelimiter = false;
-      delimiter.ignore = true;
-    }
+    delimiter.type = include;
     setRowDelimiters(
       delimiters.map((delimiter): string => {
-        if (delimiter.isRowDelimiter) {
+        if (delimiter.type === "row") {
           return delimiter.delimiter;
         }
       })
     );
     const columnDelimeter = delimiters.filter(
-      (delimiter) => delimiter.isColumnDelimiter
-    )[0].delimiter;
-
-    setColDelimiters(columnDelimeter);
+      (delimiter) => delimiter.type === "col"
+    )[0]?.delimiter;
+    if (columnDelimeter) {
+      setColDelimiters(columnDelimeter);
+    }
   }
   return (
     <>
       <Header />
       <Filters
-        delimiters={delimiter_list}
+        delimiters={delimiters}
         handleCheck={handleCheck}
         isChecked={isRecursive}
         handleSelect={handleSelect}

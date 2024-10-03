@@ -1,15 +1,13 @@
 export interface IDelimiter {
   delimiter: string;
-  isRowDelimiter: boolean;
-  isColumnDelimiter: boolean;
-  ignore: boolean;
+  type: "row" | "col" | "ignore";
+  found: boolean;
 }
 
 class Delimiter implements IDelimiter {
   delimiter: string;
-  isRowDelimiter: boolean = true;
-  isColumnDelimiter: boolean = false;
-  ignore: boolean = false;
+  type: "row" | "col" | "ignore" = "row";
+  found: boolean = false;
 
   constructor(delimiter: string) {
     this.delimiter = delimiter;

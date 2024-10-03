@@ -1,14 +1,17 @@
+import { IDelimiter } from "../models/delimiter";
+
 export const Filters = ({
   delimiters,
   handleCheck,
   isChecked,
   handleSelect,
 }: {
-  delimiters: string[];
+  delimiters: IDelimiter[];
   handleCheck: () => void;
   isChecked: boolean;
   handleSelect: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }) => {
+  const foundDelimiters = delimiters.filter((delimiter) => delimiter.found);
   return (
     <section className="filters">
       <div className="multi">
@@ -24,12 +27,14 @@ export const Filters = ({
       <div className="found-delimiters">
         <header>Found Delimiters</header>
         <div className="delimiters">
-          {delimiters.map((delimiter) => (
+          {foundDelimiters.map((delimiter) => (
             <div className="delimiter">
-              <label htmlFor={delimiter + "-select"}>{delimiter}</label>
+              <label htmlFor={delimiter.delimiter + "-select"}>
+                {delimiter.delimiter}
+              </label>
               <select
-                name={delimiter + "-select"}
-                id={delimiter + "-select"}
+                name={delimiter.delimiter + "-select"}
+                id={delimiter.delimiter + "-select"}
                 onChange={handleSelect}
               >
                 <option value="row">Indicates new row</option>
