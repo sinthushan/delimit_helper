@@ -1,22 +1,19 @@
-import React, { useEffect, useState } from "react";
+//TODO: Fix the below code to work with new delimiter array of Delimiter instances
+
+import React, { useState } from "react";
 import { ResultPane } from "./components/ResultPane";
 import { TextArea } from "./components/TextArea";
 import { Header } from "./components/Header";
 import { Filters } from "./components/Filters";
-
+import { IDelimiter, delimiters } from "./models/delimiter";
 function App() {
   const [text, setText] = useState("");
   const [isRecursive, setIsRecursive] = useState(false);
-  const [rowDelimiters, setRowDelimiters] = useState<string[]>([
-    ",",
-    " ",
-    ";",
-    "|",
-    "\t",
-  ]);
+
+  const [rowDelimiters, setRowDelimiters] = useState<string[]>([]);
   const [colDelimiters, setColDelimiters] = useState("");
   let delimiter_list: string[] = [];
-  const delimiters: string[] = [",", " ", ";", "|", "\t"];
+  //const delimiters: string[] = [",", " ", ";", "|", "\t"];
   const result = find_delimiters(text);
 
   function cleanArray(arr: string[]): string[] {
@@ -26,10 +23,6 @@ function App() {
       .filter((n) => n);
   }
 
-  function colDelimit(arr: string[]) {
-    console.log("yp");
-  }
-
   function find_delimiters(words: string): string[] {
     if (!words) {
       return ["Waiting for input..."];
@@ -37,20 +30,19 @@ function App() {
 
     const possible_delimiters: (number | string | string[])[][] = [];
 
-    delimiters.forEach((delimiter: string) => {
-      const arr = words.split(delimiter);
+    delimiters.forEach((delimiter: IDelimiter) => {
+      const arr = words.split(delimiter.delimiter);
       const count = arr.length - 1;
       if (count > 0) {
-        if (!delimiter_list.includes(delimiter)) {
+        if (!delimiter_list.includes(delimiter.delimiter)) {
           if (isRecursive) {
-            delimiter_list.push(delimiter);
+            delimiter_list.push(delimiter.delimiter);
           } else {
-            delimiter_list = [delimiter];
+            delimiter_list = [delimiter.delimiter];
           }
         }
-        console.log(rowDelimiters);
-        if (rowDelimiters.includes(delimiter)) {
-          possible_delimiters.push([count, delimiter, arr]);
+        if (delimiter.isRowDelimiter) {
+          possible_delimiters.push([count, delimiter.delimiter, arr]);
         }
       }
     });
@@ -84,25 +76,34 @@ function App() {
   }
   function handleSelect(e: React.ChangeEvent<HTMLSelectElement>) {
     const include = e.target.value;
-    const delimiter = e.target.labels[0].innerText;
+    const delimiter = delimiters.filter(
+      (delimiter) => delimiter.delimiter === e.target.labels[0].innerText
+    )[0];
     if (include === "col") {
-      setColDelimiters(delimiter);
-      const arr = rowDelimiters.filter((del) => del !== delimiter);
-      setRowDelimiters(arr);
+      delimiter.isRowDelimiter = false;
+      delimiter.isColumnDelimiter = true;
+      delimiter.ignore = false;
     } else if (include === "row") {
-      if (!rowDelimiters.includes(delimiter)) {
-        setRowDelimiters([...rowDelimiters, delimiter]);
-      }
-      if (colDelimiters === delimiter) {
-        setColDelimiters("");
-      }
+      delimiter.isRowDelimiter = true;
+      delimiter.isColumnDelimiter = false;
+      delimiter.ignore = false;
     } else if (include === "ignore") {
-      const arr = rowDelimiters.filter((del) => del !== delimiter);
-      setRowDelimiters(arr);
-      if (colDelimiters === delimiter) {
-        setColDelimiters("");
-      }
+      delimiter.isRowDelimiter = false;
+      delimiter.isColumnDelimiter = false;
+      delimiter.ignore = true;
     }
+    setRowDelimiters(
+      delimiters.map((delimiter): string => {
+        if (delimiter.isRowDelimiter) {
+          return delimiter.delimiter;
+        }
+      })
+    );
+    const columnDelimeter = delimiters.filter(
+      (delimiter) => delimiter.isColumnDelimiter
+    )[0].delimiter;
+
+    setColDelimiters(columnDelimeter);
   }
   return (
     <>
