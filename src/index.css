@@ -74,10 +74,43 @@ td {
 }
 
 .filters {
+  display: flex;
+  flex-direction: row;
   background-color: #3c6e71;
   padding: 1rem;
   border-radius: 10px;
   height: 160px;
+}
+
+.addDelimiterSection input {
+  background-color: #ffffff;
+  border: none;
+  padding: 0.2rem;
+  margin: 1rem 0;
+}
+
+.addDelimiterSection label {
+  font-weight: bold;
+  color: #ffffff;
+  text-align: center;
+}
+
+.addDelimiterSection {
+  display: flex;
+  flex-direction: column;
+  border: 2px solid #b1cecf;
+  padding: 1rem;
+  height: 100%;
+  margin-right: 1rem;
+  flex: 0;
+}
+
+.newDelimiterBtn {
+  text-align: center;
+  background-color: #b1cecf;
+  border: none;
+  border-radius: 10px;
+  padding: 0.5rem 0;
 }
 
 .delimiters {
@@ -112,6 +145,7 @@ select {
   border: 2px solid #b1cecf;
   padding: 1rem;
   height: 100%;
+  flex: 1;
 }
 
 .found-delimiters header {
@@ -131,14 +165,14 @@ select {
   background-color: #b1cecf;
   border: none;
   border-radius: 10px;
+  float: right;
 }
 
 .clearbutton {
   padding: 0.3rem 0.7rem;
   margin-top: 0.2rem;
-  margin-right: auto;
-  position: relative;
-  left: 88%;
+  margin-right: 0.2rem;
+  float: right;
   text-align: center;
   background-color: #b1cecf;
   border: none;

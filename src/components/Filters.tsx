@@ -3,13 +3,29 @@ import { IDelimiter } from "../models/delimiter";
 export const Filters = ({
   delimiters,
   handleSelect,
+  newDelimiterRef,
+  addDelimiter,
 }: {
   delimiters: IDelimiter[];
   handleSelect: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  newDelimiterRef: React.RefObject<HTMLInputElement>;
+  addDelimiter: () => void;
 }) => {
   const foundDelimiters = delimiters.filter((delimiter) => delimiter.found);
   return (
     <section className="filters">
+      <div className="addDelimiterSection">
+        <label htmlFor="newDelimiter">Add New Delimiter</label>
+        <input
+          type="text"
+          id="newDelimiter"
+          name="newDelimiter"
+          ref={newDelimiterRef}
+        />
+        <button className="newDelimiterBtn" onClick={addDelimiter}>
+          Add
+        </button>
+      </div>
       <div className="found-delimiters">
         <header>Found Delimiters</header>
         <div className="delimiters">

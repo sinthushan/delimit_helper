@@ -5,7 +5,7 @@ export interface IDelimiter {
   found: boolean;
 }
 
-class Delimiter implements IDelimiter {
+export class Delimiter implements IDelimiter {
   delimiter: string;
   type: "row" | "col" | "ignore" = "row";
   found: boolean = false;

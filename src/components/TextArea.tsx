@@ -13,7 +13,7 @@ export const TextArea = ({
         Clear
       </button>
       <textarea
-        placeholder="Paste in the text you wish to delimit"
+        placeholder="Paste or type in the text you wish to delimit"
         value={text}
         onChange={handleInput}
       />

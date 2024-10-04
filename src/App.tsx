@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ResultPane } from "./components/ResultPane";
 import { TextArea } from "./components/TextArea";
 import { Header } from "./components/Header";
 import { Filters } from "./components/Filters";
-import { IDelimiter, delimiters } from "./models/delimiter";
+import { Delimiter, IDelimiter, delimiters } from "./models/delimiter";
 function App() {
   const [text, setText] = useState("");
   const [delimitedText, setDelimitedText] = useState<string[][]>([[""]]);
+  const newDelimiterRef = useRef<HTMLInputElement>(null);
   const possible_delimiters = find_delimiters(text);
   let message = "";
 
@@ -53,8 +54,8 @@ function App() {
   }
 
   function delimitText(text: string): string[][] {
-    const ROWDELIMITER = "#&^";
-    const COLDELIMITER = "$%&";
+    const ROWDELIMITER = "♔";
+    const COLDELIMITER = "♕";
 
     delimiters.forEach((delimiter: IDelimiter) => {
       if (delimiter.type === "row") {
@@ -103,10 +104,32 @@ function App() {
     setText("");
   }
 
+  function addDelimiter() {
+    const value = newDelimiterRef.current?.value;
+    if (value) {
+      if (value === "♔" || value === "♕") {
+        window.alert("Character not allowed");
+        return;
+      }
+
+      const delimiter = new Delimiter(value);
+      delimiters.push(delimiter);
+      setDelimitedText(delimitText(text));
+      newDelimiterRef.current.value = "";
+    } else {
+      window.alert("Please provide a value");
+    }
+  }
+
   return (
     <>
       <Header />
-      <Filters delimiters={delimiters} handleSelect={handleSelect} />
+      <Filters
+        delimiters={delimiters}
+        handleSelect={handleSelect}
+        newDelimiterRef={newDelimiterRef}
+        addDelimiter={addDelimiter}
+      />
       <main className="container">
         <TextArea
           handleInput={handleInput}
