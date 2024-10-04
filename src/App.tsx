@@ -14,6 +14,7 @@ function App() {
     message = "Waiting for user input...";
   } else if (possible_delimiters.length === 0) {
     message = "No delimiters found";
+    cleanDelimiters();
   } else {
     message = "";
   }
@@ -22,12 +23,20 @@ function App() {
     setDelimitedText(delimitText(text));
   }, [text]);
 
+  function cleanDelimiters() {
+    delimiters.forEach((delimiter: IDelimiter) => (delimiter.type = "row"));
+  }
+
   function find_delimiters(text: string): (number | string | string[])[][] {
     const possible_delimiters: (number | string | string[])[][] = [];
     delimiters.forEach((delimiter: IDelimiter) => {
       let arr = [];
-      if (delimiter.delimiter == "space") {
+      if (delimiter.delimiter === "space") {
         arr = text.split(" ");
+      } else if (delimiter.delimiter === "new line") {
+        arr = text.split("\n");
+      } else if (delimiter.delimiter === "tab") {
+        arr = text.split("\t");
       } else {
         arr = text.split(delimiter.delimiter);
       }
@@ -49,14 +58,22 @@ function App() {
 
     delimiters.forEach((delimiter: IDelimiter) => {
       if (delimiter.type === "row") {
-        if (delimiter.delimiter == "space") {
+        if (delimiter.delimiter === "space") {
           text = text.replaceAll(" ", ROWDELIMITER);
+        } else if (delimiter.delimiter === "new line") {
+          text = text.replaceAll("\n", ROWDELIMITER);
+        } else if (delimiter.delimiter === "tab") {
+          text = text.replaceAll("\t", ROWDELIMITER);
         } else {
           text = text.replaceAll(delimiter.delimiter, ROWDELIMITER);
         }
       } else if (delimiter.type === "col") {
-        if (delimiter.delimiter == "space") {
+        if (delimiter.delimiter === "space") {
           text = text.replaceAll(" ", COLDELIMITER);
+        } else if (delimiter.delimiter === "new line") {
+          text = text.replaceAll("\n", COLDELIMITER);
+        } else if (delimiter.delimiter === "tab") {
+          text = text.replaceAll("\t", COLDELIMITER);
         } else {
           text = text.replaceAll(delimiter.delimiter, COLDELIMITER);
         }
@@ -81,12 +98,21 @@ function App() {
     )[0].type = include;
     setDelimitedText(delimitText(text));
   }
+
+  function clearTextArea() {
+    setText("");
+  }
+
   return (
     <>
       <Header />
       <Filters delimiters={delimiters} handleSelect={handleSelect} />
       <main className="container">
-        <TextArea handleInput={handleInput} text={text} />
+        <TextArea
+          handleInput={handleInput}
+          text={text}
+          clearTextArea={clearTextArea}
+        />
         <ResultPane message={message} delimitedText={delimitedText} />
       </main>
     </>

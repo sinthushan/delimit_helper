@@ -15,7 +15,7 @@ class Delimiter implements IDelimiter {
   }
 }
 
-const DELIMITERS_LIST = [",", "space", ";", "|", "\t"];
+const DELIMITERS_LIST = [",", "space", ";", "|", "tab", "new line"];
 
 export const delimiters: Delimiter[] = DELIMITERS_LIST.map(
   (delimiter) => new Delimiter(delimiter)
