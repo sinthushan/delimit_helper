@@ -65,12 +65,14 @@ table {
   table-layout: fixed;
   width: 100%;
   border-collapse: collapse;
+  border: 1px dotted #b1cecf;
 }
 
 td {
   max-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
+  border: 1px dotted #b1cecf;
 }
 
 .filters {

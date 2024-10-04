@@ -23,7 +23,7 @@ export const ResultPane = ({
         </button>
       )}
 
-      {delimitedText ? (
+      {delimitedText[0][0] ? (
         <table ref={ref}>
           <tbody>
             {delimitedText.map((row) => (
