@@ -15,7 +15,7 @@ function App() {
   } else if (possible_delimiters.length === 0) {
     message = "No delimiters found";
   } else {
-    message = "Please see results:";
+    message = "";
   }
 
   useEffect(() => {
