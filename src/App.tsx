@@ -13,6 +13,7 @@ function App() {
 
   if (!text) {
     message = "Waiting for user input...";
+    cleanDelimiters();
   } else if (possible_delimiters.length === 0) {
     message = "No delimiters found";
     cleanDelimiters();
